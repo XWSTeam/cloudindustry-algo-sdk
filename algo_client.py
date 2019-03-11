@@ -26,7 +26,7 @@ with open("data.json",'r') as load_f:
     data = json.load(load_f)
 
 endpoint = 'http://' + host
-request_parameters = json.dumps(data)
+request_parameters = json.dumps(data, separators=(',',':'), ensure_ascii=False, sort_keys= True)
 print('-- step 1 -- read request body\n%s\n' % request_parameters)
 # 计算签名摘要函数
 def sign(key, msg):
@@ -38,7 +38,8 @@ def getSignatureKey(key, creDate, serviceName):
     kSigning = sign(kService, 'tc3_request')
     return kSigning
 # 获取当前时间戳，以及相应的UTC标准时间日期
-timestamp = int(time.time())
+# timestamp = int(time.time())
+timestamp = int(time.mktime((2019, 3, 11, 0, 0, 0, 0, 0, 0)))
 credDate = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d')
 # ************* 计算签名 START *************
 # ************* 步骤 1: 创建规范请求串 *************
@@ -47,6 +48,7 @@ canonical_querystring = ''
 canonical_headers = 'content-type:application/json\n' + 'host:' + host + '\n'
 signed_headers = 'content-type;host'
 payload_hash = hashlib.sha256(request_parameters.encode("utf-8")).hexdigest()
+print ('-- step 1.1 -- hashed payload:\n%s\n' % payload_hash)
 canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
 print ('-- step 2 -- create canonical request:\n%s\n' % canonical_request)
 # ************* 步骤 2: 创建签名串*************
@@ -76,6 +78,6 @@ headers = {
 # ************* 发送HTTP请求 *************
 print('-- step 5 -- sending request to endpoint: \n%s\n' % endpoint)
 r = requests.post(endpoint+canonical_uri + "api3",
-                  json=data,
+                  data=request_parameters,
                   headers=headers)
 print('-- step 6 -- receive response: \nstatus code:\n%d\nreponse body: \n%s\n' % (r.status_code, r.text))
