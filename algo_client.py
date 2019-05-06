@@ -10,15 +10,15 @@ import requests
 
 
 # 密钥参数(for用户修改)
-secret_id = '699982116f81c118ae33'
-secret_key = 'e79ff1c278e9ad6c914008dcb41eaa893d848cf40f8715a04012180273d0f234'
+secret_id = '71a0eddf562e58d43907'
+secret_key = 'cc688bc810a4829ed4ddc6905f1d609eace152dc1998e09a769848a7c8ca5b47'
 
 # 请求参数
 method = 'POST'
 service = 'asm'
-host = '212.64.84.249:8086'
+host = '10.1.1.17:8088'
 region = 'hz'
-action = 'Invoke'
+action = 'NotifyUserDelStage'
 version = '2019-01-09'
 
 print('-- starting cloud industry ai algo client --')
@@ -38,8 +38,7 @@ def getSignatureKey(key, creDate, serviceName):
     kSigning = sign(kService, 'tc3_request')
     return kSigning
 # 获取当前时间戳，以及相应的UTC标准时间日期
-# timestamp = int(time.time())
-timestamp = int(time.mktime((2019, 3, 11, 0, 0, 0, 0, 0, 0)))
+timestamp = int(time.time())
 credDate = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d')
 # ************* 计算签名 START *************
 # ************* 步骤 1: 创建规范请求串 *************
@@ -76,8 +75,8 @@ headers = {
               'X-TC-Region': region,
           }
 # ************* 发送HTTP请求 *************
-print('-- step 5 -- sending request to endpoint: \n%s\n' % endpoint)
-r = requests.post(endpoint+canonical_uri + "api3",
+print('-- step 5 -- sending request to endpoint: \n{}\nheaders:\n{}\n'.format(endpoint, headers))
+r = requests.post(endpoint + canonical_uri + "api3",
                   data=request_parameters,
                   headers=headers)
 print('-- step 6 -- receive response: \nstatus code:\n%d\nreponse body: \n%s\n' % (r.status_code, r.text))
